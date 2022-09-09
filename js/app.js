@@ -1,14 +1,22 @@
-const loadPhone = async(searchText) => {
+const loadPhone = async(searchText, datalimit) => {
     const url = `https://openapi.programming-hero.com/api/phones?search=${searchText}`
     const res = await fetch(url);
     const data = await res.json();
-    displayPhones(data.data);
+    displayPhones(data.data, datalimit);
 }
 
-const displayPhones = phones =>{
+const displayPhones = (phones, datalimit) =>{
     const phonesContainer = document.getElementById('phones-container');
     phonesContainer.yextContent = '';
-    phones = phones.slice(0, 12);
+    const showAll =  document.getElementById('show-all');
+    if(datalimit && phones.length > 12){
+        phones = phones.slice(0, 12);
+       showAll.classList.remove('d-none');
+    }
+    else{
+        showAll.classList.add('d-none');
+    }
+
     const noPhone = document.getElementById('no-found-message');
     if(phones.length === 0){
         noPhone.classList.remove('d-none');
@@ -30,11 +38,15 @@ const displayPhones = phones =>{
     toggleSpinner(false);
 }
 
-document.getElementById('btn-search').addEventListener('click', function(){
+const processSearch = (datalimit) =>{
     toggleSpinner(true);
     const searchField = document.getElementById('search-field');
     const searchText = searchField.value;
-    loadPhone(searchText);
+    loadPhone(searchText, datalimit);
+}
+
+document.getElementById('btn-search').addEventListener('click', function(){
+  processSearch(12);
 })
 
 const toggleSpinner = isLoading => {
@@ -46,5 +58,10 @@ const toggleSpinner = isLoading => {
         loaderSection.classList.add('d-none');
     }
 }
+
+
+document.getElementById('btn-show-all').addEventListener('click', function(){
+    processSearch();
+})
 
 // loadPhone();
